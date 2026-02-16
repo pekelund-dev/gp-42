@@ -3,21 +3,22 @@ package dev.pekelund.gp42;
 import java.awt.*;
 import java.awt.geom.Area;
 import java.awt.geom.Path2D;
-import java.awt.geom.RoundRectangle2D;
 
 public class Track {
     private int width;
     private int height;
     private Area trackArea;
+    private Path2D outerBoundary;
+    private Path2D innerBoundary;
     
     // Track boundaries
-    private static final int MARGIN = 10;
-    private static final int TOP_MARGIN = 40;
-    private static final int BOTTOM_MARGIN = 40;
-    private static final int CORNER_RADIUS = 15;
+    private static final int MARGIN = 20;
+    private static final int TOP_MARGIN = 50;
+    private static final int BOTTOM_MARGIN = 60;
+    private static final int TRACK_WIDTH = 60; // Width of racing path
     
     // Dash patterns for track lines
-    private static final float[] BORDER_DASH = {3, 3};
+    private static final float[] BORDER_DASH = {5, 5};
     
     public Track(int width, int height) {
         this.width = width;
@@ -26,59 +27,67 @@ public class Track {
     }
     
     private void createTrack() {
-        // Create a continuous maze path with rounded corners
+        // Create a proper racing track with inner and outer boundaries
+        // Like the reference image shows - a continuous path to race around
+        
         int left = MARGIN;
         int right = width - MARGIN;
         int top = TOP_MARGIN;
         int bottom = height - BOTTOM_MARGIN;
         
-        // Start with full playable area
-        RoundRectangle2D outer = new RoundRectangle2D.Double(left, top, right - left, bottom - top, 
-                                                              CORNER_RADIUS, CORNER_RADIUS);
-        trackArea = new Area(outer);
+        // Create outer boundary - complex shape matching the image
+        outerBoundary = new Path2D.Double();
+        outerBoundary.moveTo(left, top);
         
-        // Create continuous maze path by subtracting rounded obstacles
-        // This creates a winding path through the maze with rounded corners
+        // Top edge with curves
+        outerBoundary.lineTo(left + 200, top);
+        outerBoundary.quadTo(left + 250, top, left + 260, top + 30);
+        outerBoundary.lineTo(left + 260, top + 80);
+        outerBoundary.quadTo(left + 260, top + 110, left + 290, top + 120);
+        outerBoundary.lineTo(right - 100, top + 120);
+        outerBoundary.quadTo(right - 50, top + 120, right, top + 170);
         
-        // Top-left section - create winding path
-        addRoundedWall(80, 55, 160, 20);
-        addRoundedWall(80, 55, 20, 90);
-        addRoundedWall(80, 125, 90, 20);
+        // Right edge
+        outerBoundary.lineTo(right, bottom - 50);
+        outerBoundary.quadTo(right, bottom, right - 50, bottom);
         
-        // Top-center path
-        addRoundedWall(270, 55, 20, 100);
-        addRoundedWall(270, 135, 70, 20);
+        // Bottom edge
+        outerBoundary.lineTo(left + 50, bottom);
+        outerBoundary.quadTo(left, bottom, left, bottom - 50);
         
-        // Top-right winding section
-        addRoundedWall(390, 55, 20, 70);
-        addRoundedWall(405, 95, 90, 20);
-        addRoundedWall(480, 95, 20, 50);
+        // Left edge
+        outerBoundary.lineTo(left, top);
+        outerBoundary.closePath();
         
-        // Right side path
-        addRoundedWall(550, 80, 110, 20);
-        addRoundedWall(550, 80, 20, 110);
-        addRoundedWall(550, 170, 70, 20);
+        // Create inner boundary - creates the racing path width
+        innerBoundary = new Path2D.Double();
+        int innerLeft = left + TRACK_WIDTH;
+        int innerRight = right - TRACK_WIDTH;
+        int innerTop = top + TRACK_WIDTH;
+        int innerBottom = bottom - TRACK_WIDTH;
         
-        // Center obstacles with rounded corners
-        addRoundedWall(220, 175, 20, 50);
-        addRoundedWall(340, 190, 50, 20);
+        innerBoundary.moveTo(innerLeft, innerTop);
         
-        // Bottom-right section
-        addRoundedWall(580, 240, 20, 80);
-        addRoundedWall(480, 295, 100, 20);
+        // Inner path following outer shape but smaller
+        innerBoundary.lineTo(innerLeft + 140, innerTop);
+        innerBoundary.quadTo(innerLeft + 180, innerTop, innerLeft + 190, innerTop + 25);
+        innerBoundary.lineTo(innerLeft + 190, innerTop + 60);
+        innerBoundary.quadTo(innerLeft + 190, innerTop + 80, innerLeft + 210, innerTop + 85);
+        innerBoundary.lineTo(innerRight - 80, innerTop + 85);
+        innerBoundary.quadTo(innerRight - 40, innerTop + 85, innerRight, innerTop + 125);
         
-        // Bottom section winding path
-        addRoundedWall(100, 280, 350, 20);
-        addRoundedWall(180, 210, 20, 85);
-        addRoundedWall(280, 235, 110, 20);
+        innerBoundary.lineTo(innerRight, innerBottom - 40);
+        innerBoundary.quadTo(innerRight, innerBottom, innerRight - 40, innerBottom);
         
-        // Left bottom corner path
-        addRoundedWall(35, 235, 70, 20);
-    }
-    
-    private void addRoundedWall(double x, double y, double w, double h) {
-        RoundRectangle2D wall = new RoundRectangle2D.Double(x, y, w, h, CORNER_RADIUS, CORNER_RADIUS);
-        trackArea.subtract(new Area(wall));
+        innerBoundary.lineTo(innerLeft + 40, innerBottom);
+        innerBoundary.quadTo(innerLeft, innerBottom, innerLeft, innerBottom - 40);
+        
+        innerBoundary.lineTo(innerLeft, innerTop);
+        innerBoundary.closePath();
+        
+        // Track is the area BETWEEN outer and inner boundaries
+        trackArea = new Area(outerBoundary);
+        trackArea.subtract(new Area(innerBoundary));
     }
     
     public boolean isOnTrack(double x, double y) {
@@ -86,11 +95,11 @@ public class Track {
     }
     
     public void draw(Graphics2D g) {
-        // Draw background (dark gray like in image)
+        // Draw background (dark gray)
         g.setColor(new Color(90, 90, 90));
         g.fillRect(0, 0, width, height);
         
-        // Draw track surface (slightly lighter gray)
+        // Draw track surface (the racing path between boundaries)
         g.setColor(new Color(100, 100, 100));
         g.fill(trackArea);
         
@@ -100,7 +109,8 @@ public class Track {
                                         0, BORDER_DASH, 0);
         g.setStroke(dashed);
         
-        // Draw the track outline
-        g.draw(trackArea);
+        // Draw both boundaries
+        g.draw(outerBoundary);
+        g.draw(innerBoundary);
     }
 }

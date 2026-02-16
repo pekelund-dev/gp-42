@@ -103,33 +103,15 @@ public class Car {
     }
     
     public void draw(Graphics2D g) {
-        // Draw car with visible details like tires
+        // Draw car as simple text character like in the reference image
         Graphics2D g2 = (Graphics2D) g.create();
         g2.translate(x, y);
         g2.rotate(angle);
         
-        // Draw car body
+        // Draw car as a simple symbol (like # in the image)
         g2.setColor(color);
-        g2.fillRect(-CAR_WIDTH/2, -CAR_HEIGHT/2, CAR_WIDTH, CAR_HEIGHT);
-        
-        // Draw outline
-        g2.setColor(Color.WHITE);
-        g2.drawRect(-CAR_WIDTH/2, -CAR_HEIGHT/2, CAR_WIDTH, CAR_HEIGHT);
-        
-        // Draw tires (4 corners)
-        g2.setColor(Color.DARK_GRAY);
-        // Front left tire
-        g2.fillRect(-CAR_WIDTH/2 - 1, -CAR_HEIGHT/2 + 2, 2, 4);
-        // Front right tire
-        g2.fillRect(-CAR_WIDTH/2 - 1, CAR_HEIGHT/2 - 6, 2, 4);
-        // Rear left tire
-        g2.fillRect(CAR_WIDTH/2 - 1, -CAR_HEIGHT/2 + 2, 2, 4);
-        // Rear right tire
-        g2.fillRect(CAR_WIDTH/2 - 1, CAR_HEIGHT/2 - 6, 2, 4);
-        
-        // Draw front indicator
-        g2.setColor(Color.RED);
-        g2.fillRect(CAR_WIDTH/2 - 3, -2, 3, 4);
+        g2.setFont(new Font("Monospaced", Font.BOLD, 20));
+        g2.drawString("#", -10, 5);
         
         g2.dispose();
     }

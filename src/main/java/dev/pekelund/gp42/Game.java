@@ -45,20 +45,20 @@ public class Game extends JPanel implements ActionListener, KeyListener {
         gameOver = false;
         gameTime = 0;
         
-        // Initialize black car - in lower left area matching image
+        // Initialize black car - on bottom section of track
         blackCar = new Car(
             "BLACK",
-            230,
-            340,
+            150,
+            310,
             Color.BLACK,
             KeyEvent.VK_W, KeyEvent.VK_S, KeyEvent.VK_A, KeyEvent.VK_D
         );
         
-        // Initialize white car - in different area
+        // Initialize white car - on right section of track
         whiteCar = new Car(
             "WHITE",
-            450,
-            250,
+            600,
+            200,
             Color.WHITE,
             KeyEvent.VK_UP, KeyEvent.VK_DOWN, KeyEvent.VK_LEFT, KeyEvent.VK_RIGHT
         );
