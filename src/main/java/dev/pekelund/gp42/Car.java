@@ -3,8 +3,10 @@ package dev.pekelund.gp42;
 import java.awt.*;
 
 public class Car {
-    // Car constants - much smaller to match image
-    private static final int CAR_SIZE = 4; // Tiny sprite like in image
+    // Car constants - bigger with visible details
+    private static final int CAR_SIZE = 16;
+    private static final int CAR_WIDTH = 16;
+    private static final int CAR_HEIGHT = 16;
     private static final double MAX_SPEED = 2.5;
     private static final double ACCELERATION = 0.12;
     private static final double FRICTION = 0.04;
@@ -101,16 +103,35 @@ public class Car {
     }
     
     public void draw(Graphics2D g) {
-        // Draw car as a tiny sprite matching the image
-        g.setColor(color);
+        // Draw car with visible details like tires
+        Graphics2D g2 = (Graphics2D) g.create();
+        g2.translate(x, y);
+        g2.rotate(angle);
         
-        // Simple small square/circle sprite
-        g.fillRect((int)(x - CAR_SIZE/2), (int)(y - CAR_SIZE/2), CAR_SIZE, CAR_SIZE);
+        // Draw car body
+        g2.setColor(color);
+        g2.fillRect(-CAR_WIDTH/2, -CAR_HEIGHT/2, CAR_WIDTH, CAR_HEIGHT);
         
-        // Optional: draw a small direction indicator
-        int dirX = (int)(x + Math.cos(angle) * CAR_SIZE);
-        int dirY = (int)(y + Math.sin(angle) * CAR_SIZE);
-        g.drawLine((int)x, (int)y, dirX, dirY);
+        // Draw outline
+        g2.setColor(Color.WHITE);
+        g2.drawRect(-CAR_WIDTH/2, -CAR_HEIGHT/2, CAR_WIDTH, CAR_HEIGHT);
+        
+        // Draw tires (4 corners)
+        g2.setColor(Color.DARK_GRAY);
+        // Front left tire
+        g2.fillRect(-CAR_WIDTH/2 - 1, -CAR_HEIGHT/2 + 2, 2, 4);
+        // Front right tire
+        g2.fillRect(-CAR_WIDTH/2 - 1, CAR_HEIGHT/2 - 6, 2, 4);
+        // Rear left tire
+        g2.fillRect(CAR_WIDTH/2 - 1, -CAR_HEIGHT/2 + 2, 2, 4);
+        // Rear right tire
+        g2.fillRect(CAR_WIDTH/2 - 1, CAR_HEIGHT/2 - 6, 2, 4);
+        
+        // Draw front indicator
+        g2.setColor(Color.RED);
+        g2.fillRect(CAR_WIDTH/2 - 3, -2, 3, 4);
+        
+        g2.dispose();
     }
     
     public void addScore(int points) {
