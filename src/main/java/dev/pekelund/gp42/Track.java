@@ -18,6 +18,11 @@ public class Track {
     private static final int BOTTOM_MARGIN = 40;
     private static final int TRACK_WIDTH = 50; // Width of the racing path
     
+    // Start/finish line
+    private static final int START_LINE_X = 70;
+    private static final int CHECKER_WIDTH = 5;
+    private static final int CHECKER_HEIGHT = 12;
+    
     // Dash patterns for track lines
     private static final float[] BORDER_DASH = {5, 5};
     
@@ -110,6 +115,22 @@ public class Track {
         
         // Draw inner boundary
         g.draw(innerBoundary);
+        
+        // Draw start/finish line on bottom straight
+        g.setColor(Color.WHITE);
+        g.setStroke(new BasicStroke(3));
+        int startY1 = height - BOTTOM_MARGIN - TRACK_WIDTH;
+        int startY2 = height - BOTTOM_MARGIN;
+        // Draw checkered pattern for start/finish
+        for (int i = 0; i < 4; i++) {
+            if (i % 2 == 0) {
+                g.setColor(Color.WHITE);
+            } else {
+                g.setColor(Color.BLACK);
+            }
+            g.fillRect(START_LINE_X, startY1 + i * CHECKER_HEIGHT, CHECKER_WIDTH, CHECKER_HEIGHT);
+            g.fillRect(START_LINE_X + CHECKER_WIDTH, startY1 + i * CHECKER_HEIGHT, CHECKER_WIDTH, CHECKER_HEIGHT);
+        }
         
         // Draw center line (optional)
         g.setColor(new Color(150, 150, 150));
