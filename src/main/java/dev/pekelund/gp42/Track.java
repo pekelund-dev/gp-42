@@ -14,6 +14,10 @@ public class Track {
     private static final int MARGIN = 30;
     private static final int TRACK_WIDTH = 60;
     
+    // Dash patterns for track lines
+    private static final float[] BORDER_DASH = {5, 5};
+    private static final float[] CENTER_DASH = {3, 3};
+    
     public Track(int width, int height) {
         this.width = width;
         this.height = height;
@@ -50,7 +54,7 @@ public class Track {
         // Draw track boundaries with dotted lines
         g.setColor(Color.WHITE);
         Stroke dashed = new BasicStroke(2, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL,
-                                        0, new float[]{5, 5}, 0);
+                                        0, BORDER_DASH, 0);
         g.setStroke(dashed);
         g.draw(trackArea);
         
@@ -62,9 +66,8 @@ public class Track {
         int centerY = MARGIN + TRACK_WIDTH / 2;
         
         Ellipse2D centerLine = new Ellipse2D.Double(centerX, centerY, centerWidth, centerHeight);
-        float[] dashPattern = {3, 3};
         g.setStroke(new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL,
-                                    0, dashPattern, 0));
+                                    0, CENTER_DASH, 0));
         g.setColor(new Color(150, 150, 150));
         g.draw(centerLine);
     }
