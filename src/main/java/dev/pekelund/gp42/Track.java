@@ -2,20 +2,21 @@ package dev.pekelund.gp42;
 
 import java.awt.*;
 import java.awt.geom.Area;
+import java.awt.geom.Path2D;
 import java.awt.geom.Rectangle2D;
-import java.util.ArrayList;
-import java.util.List;
 
 public class Track {
     private int width;
     private int height;
     private Area trackArea;
-    private List<Rectangle2D> walls;
+    private Path2D outerBoundary;
+    private Path2D innerBoundary;
     
     // Track boundaries
-    private static final int HORIZONTAL_MARGIN = 10;
+    private static final int MARGIN = 10;
     private static final int TOP_MARGIN = 40;
     private static final int BOTTOM_MARGIN = 40;
+    private static final int TRACK_WIDTH = 50; // Width of the racing path
     
     // Dash patterns for track lines
     private static final float[] BORDER_DASH = {5, 5};
@@ -23,75 +24,80 @@ public class Track {
     public Track(int width, int height) {
         this.width = width;
         this.height = height;
-        this.walls = new ArrayList<>();
         createTrack();
     }
     
     private void createTrack() {
-        // Create outer boundary - full screen area
-        int trackWidth = width - 2 * HORIZONTAL_MARGIN;
-        int trackHeight = height - TOP_MARGIN - BOTTOM_MARGIN;
-        Rectangle2D outer = new Rectangle2D.Double(HORIZONTAL_MARGIN, TOP_MARGIN, trackWidth, trackHeight);
-        trackArea = new Area(outer);
+        // Create a continuous racing circuit matching the image
+        // The image shows a complex circuit with curves and straights
         
-        // Create walls/obstacles that match the image layout
-        // The image shows a complex maze-like track with internal walls
+        int left = MARGIN;
+        int right = width - MARGIN;
+        int top = TOP_MARGIN;
+        int bottom = height - BOTTOM_MARGIN;
         
-        // Top-left section walls
-        addWall(120, 80, 120, 40);   // Horizontal wall
-        addWall(120, 80, 40, 50);    // Vertical wall
+        // Create outer boundary - follows outer edge of track
+        outerBoundary = new Path2D.Double();
+        outerBoundary.moveTo(left, top);
         
-        // Top-middle section
-        addWall(320, 60, 40, 90);    // Vertical divider
+        // Top edge with curves
+        outerBoundary.lineTo(right - 100, top);
+        outerBoundary.quadTo(right - 50, top, right, top + 50); // Top right curve
         
-        // Top-right curves
-        addWall(500, 80, 100, 40);   // Horizontal
-        addWall(500, 120, 40, 60);   // Vertical
+        // Right edge
+        outerBoundary.lineTo(right, bottom - 50);
+        outerBoundary.quadTo(right, bottom, right - 50, bottom); // Bottom right curve
         
-        // Middle section horizontal walls
-        addWall(80, 180, 160, 30);   // Left horizontal
-        addWall(400, 180, 200, 30);  // Right horizontal
+        // Bottom edge
+        outerBoundary.lineTo(left + 50, bottom);
+        outerBoundary.quadTo(left, bottom, left, bottom - 50); // Bottom left curve
         
-        // Center obstacles
-        addWall(280, 140, 50, 50);   // Center-ish obstacle
+        // Left edge back to start
+        outerBoundary.lineTo(left, top);
+        outerBoundary.closePath();
         
-        // Bottom section walls
-        addWall(100, 260, 400, 30);  // Long horizontal bottom wall
-        addWall(140, 290, 40, 40);   // Small bottom-left obstacle
+        // Create inner boundary - creates the track width
+        innerBoundary = new Path2D.Double();
+        int innerLeft = left + TRACK_WIDTH;
+        int innerRight = right - TRACK_WIDTH;
+        int innerTop = top + TRACK_WIDTH;
+        int innerBottom = bottom - TRACK_WIDTH;
         
-        // Right side vertical walls
-        addWall(600, 120, 40, 120);  // Right side wall
+        innerBoundary.moveTo(innerLeft, innerTop);
         
-        // Subtract walls from track area
-        for (Rectangle2D wall : walls) {
-            trackArea.subtract(new Area(wall));
-        }
-    }
-    
-    private void addWall(double x, double y, double w, double h) {
-        Rectangle2D wall = new Rectangle2D.Double(x, y, w, h);
-        walls.add(wall);
+        // Top edge inner
+        innerBoundary.lineTo(innerRight - 80, innerTop);
+        innerBoundary.quadTo(innerRight - 40, innerTop, innerRight, innerTop + 40);
+        
+        // Right edge inner  
+        innerBoundary.lineTo(innerRight, innerBottom - 40);
+        innerBoundary.quadTo(innerRight, innerBottom, innerRight - 40, innerBottom);
+        
+        // Bottom edge inner
+        innerBoundary.lineTo(innerLeft + 40, innerBottom);
+        innerBoundary.quadTo(innerLeft, innerBottom, innerLeft, innerBottom - 40);
+        
+        // Left edge inner back to start
+        innerBoundary.lineTo(innerLeft, innerTop);
+        innerBoundary.closePath();
+        
+        // Track is the area between outer and inner boundaries
+        trackArea = new Area(outerBoundary);
+        trackArea.subtract(new Area(innerBoundary));
     }
     
     public boolean isOnTrack(double x, double y) {
-        // Check if point is in track area (not in walls)
         return trackArea.contains(x, y);
     }
     
     public void draw(Graphics2D g) {
-        // Draw gray background for track
+        // Draw background
         g.setColor(new Color(100, 100, 100));
         g.fillRect(0, 0, width, height);
         
         // Draw track surface (darker gray)
         g.setColor(new Color(80, 80, 80));
         g.fill(trackArea);
-        
-        // Draw walls/obstacles (darker)
-        g.setColor(new Color(60, 60, 60));
-        for (Rectangle2D wall : walls) {
-            g.fill(wall);
-        }
         
         // Draw track boundaries with dotted white lines
         g.setColor(Color.WHITE);
@@ -100,13 +106,20 @@ public class Track {
         g.setStroke(dashed);
         
         // Draw outer boundary
-        int trackWidth = width - 2 * HORIZONTAL_MARGIN;
-        int trackHeight = height - TOP_MARGIN - BOTTOM_MARGIN;
-        g.drawRect(HORIZONTAL_MARGIN, TOP_MARGIN, trackWidth, trackHeight);
+        g.draw(outerBoundary);
         
-        // Draw walls with dotted outline
-        for (Rectangle2D wall : walls) {
-            g.draw(wall);
-        }
+        // Draw inner boundary
+        g.draw(innerBoundary);
+        
+        // Draw center line (optional)
+        g.setColor(new Color(150, 150, 150));
+        Stroke centerDash = new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL,
+                                           0, new float[]{3, 3}, 0);
+        g.setStroke(centerDash);
+        // Draw a middle guide line (simplified)
+        int midOffset = TRACK_WIDTH / 2;
+        g.drawOval(MARGIN + midOffset, TOP_MARGIN + midOffset, 
+                   width - 2 * MARGIN - 2 * midOffset, 
+                   height - TOP_MARGIN - BOTTOM_MARGIN - 2 * midOffset);
     }
 }
