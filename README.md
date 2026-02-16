@@ -1,8 +1,8 @@
 # gp-42
-GP-42 clone - A two-player arcade-style game
+GP-42 clone - A two-player racing game
 
 ## Description
-This is a Java implementation of the GP-42 arcade game. Two players (BLACK and WHITE) compete by navigating the game field, collecting food, and avoiding collisions with walls, themselves, and each other.
+This is a Java implementation of the GP-42 racing game. Two players (BLACK and WHITE) race around an oval track, competing for the best time and highest score.
 
 ## Requirements
 - Java 17 or higher
@@ -19,38 +19,45 @@ mvn exec:java
 ```
 
 ## Controls
-### Black Player
-- W: Move Up
-- S: Move Down
-- A: Move Left
-- D: Move Right
+### Black Player (Car)
+- W: Accelerate
+- S: Brake/Reverse
+- A: Turn Left
+- D: Turn Right
 
-### White Player
-- Arrow Up: Move Up
-- Arrow Down: Move Down
-- Arrow Left: Move Left
-- Arrow Right: Move Right
+### White Player (Car)
+- Arrow Up: Accelerate
+- Arrow Down: Brake/Reverse
+- Arrow Left: Turn Left
+- Arrow Right: Turn Right
 
 ### Other Controls
 - SPACE: Pause/Resume
 - R: Restart (when game over)
 
 ## Gameplay
-- Collect yellow food items to increase your score
-- Each food item is worth 10 points
-- Avoid hitting the walls (dotted border)
-- Avoid hitting your own trail
-- Avoid hitting the other player's trail
+- Race around the oval track
+- Stay on the track to earn points
+- Points are awarded continuously while racing on the track
+- Hitting the track boundaries will slow you down
+- Colliding with the other car will slow both cars down
 - First player to reach 100 points achieves "Extended Play"
 - Game tracks time and scores for both players
 
 ## Features
-- Two-player simultaneous gameplay
+- Two-player simultaneous racing
+- Realistic car physics (acceleration, turning, friction)
+- Oval race track with boundaries
 - Score tracking for both players
-- Game timer
-- Collision detection (walls, self, other player)
-- Food collection system
+- Collision detection (track boundaries, car-to-car)
 - Extended play bonus at 100 points
 - Pause functionality
-- Game over and restart capability
+- Top-down racing view
+
+## Racing Physics
+- Cars accelerate gradually when pressing forward
+- Friction slows down cars when not accelerating
+- Turning works best at higher speeds
+- Hitting walls causes bounce-back effect
+- Car-to-car collisions affect both vehicles
 
