@@ -4,6 +4,10 @@ import java.awt.*;
 import java.util.LinkedList;
 
 public class Player {
+    // Constants
+    private static final int MAX_TRAIL_LENGTH = 100;
+    private static final int COLLISION_THRESHOLD = 3;
+    
     private String name;
     private Color color;
     private LinkedList<Point> trail;
@@ -35,6 +39,22 @@ public class Player {
     
     public void move() {
         // Update direction based on key presses
+        updateDirection();
+        
+        // Move if there's a direction
+        if (dx != 0 || dy != 0) {
+            Point head = trail.getLast();
+            Point newHead = new Point(head.x + dx, head.y + dy);
+            trail.add(newHead);
+            
+            // Keep trail limited
+            if (trail.size() > MAX_TRAIL_LENGTH) {
+                trail.removeFirst();
+            }
+        }
+    }
+    
+    private void updateDirection() {
         if (upPressed && dy == 0) {
             dx = 0;
             dy = -speed;
@@ -47,18 +67,6 @@ public class Player {
         } else if (rightPressed && dx == 0) {
             dx = speed;
             dy = 0;
-        }
-        
-        // Move if there's a direction
-        if (dx != 0 || dy != 0) {
-            Point head = trail.getLast();
-            Point newHead = new Point(head.x + dx, head.y + dy);
-            trail.add(newHead);
-            
-            // Keep trail limited
-            if (trail.size() > 100) {
-                trail.removeFirst();
-            }
         }
     }
     
@@ -87,7 +95,7 @@ public class Player {
         
         for (int i = 0; i < trail.size() - 5; i++) {
             Point segment = trail.get(i);
-            if (Math.abs(segment.x - head.x) < 3 && Math.abs(segment.y - head.y) < 3) {
+            if (isColliding(head, segment)) {
                 return true;
             }
         }
@@ -99,11 +107,16 @@ public class Player {
         Point head = trail.getLast();
         
         for (Point segment : otherTrail) {
-            if (Math.abs(segment.x - head.x) < 3 && Math.abs(segment.y - head.y) < 3) {
+            if (isColliding(head, segment)) {
                 return true;
             }
         }
         return false;
+    }
+    
+    private boolean isColliding(Point p1, Point p2) {
+        return Math.abs(p1.x - p2.x) < COLLISION_THRESHOLD && 
+               Math.abs(p1.y - p2.y) < COLLISION_THRESHOLD;
     }
     
     public void draw(Graphics2D g) {

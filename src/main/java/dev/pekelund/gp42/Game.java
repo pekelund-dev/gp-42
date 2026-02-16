@@ -14,6 +14,18 @@ public class Game extends JPanel implements ActionListener, KeyListener {
     private static final int CELL_SIZE = 4;
     private static final int GAME_SPEED = 100; // milliseconds
     
+    // Border constants
+    private static final int BORDER_LEFT = 10;
+    private static final int BORDER_RIGHT = 20;
+    private static final int BORDER_TOP = 40;
+    private static final int BORDER_BOTTOM = 80;
+    
+    // Food constants
+    private static final int FOOD_SPAWN_INTERVAL = 30;
+    private static final int MAX_FOOD_COUNT = 10;
+    private static final int FOOD_COLLECTION_RADIUS = CELL_SIZE * 3;
+    private static final int FOOD_POINTS = 10;
+    
     // Game state
     private Timer timer;
     private boolean running;
@@ -72,8 +84,8 @@ public class Game extends JPanel implements ActionListener, KeyListener {
     
     private void spawnFood(int count) {
         for (int i = 0; i < count; i++) {
-            int x = CELL_SIZE * (random.nextInt((WIDTH - 40) / CELL_SIZE) + 10);
-            int y = CELL_SIZE * (random.nextInt((HEIGHT - 80) / CELL_SIZE) + 20);
+            int x = CELL_SIZE * (random.nextInt((WIDTH - BORDER_RIGHT - BORDER_LEFT) / CELL_SIZE) + BORDER_LEFT);
+            int y = CELL_SIZE * (random.nextInt((HEIGHT - BORDER_BOTTOM - BORDER_TOP) / CELL_SIZE) + BORDER_TOP / CELL_SIZE);
             food.add(new Point(x, y));
         }
     }
@@ -90,7 +102,7 @@ public class Game extends JPanel implements ActionListener, KeyListener {
             checkFoodCollection();
             
             // Spawn new food occasionally
-            if (gameTime % 30 == 0 && food.size() < 10) {
+            if (gameTime % FOOD_SPAWN_INTERVAL == 0 && food.size() < MAX_FOOD_COUNT) {
                 spawnFood(1);
             }
         }
@@ -138,18 +150,21 @@ public class Game extends JPanel implements ActionListener, KeyListener {
         Point whiteHead = whitePlayer.getHead();
         
         food.removeIf(f -> {
-            if (Math.abs(f.x - blackHead.x) < CELL_SIZE * 3 && 
-                Math.abs(f.y - blackHead.y) < CELL_SIZE * 3) {
-                blackPlayer.addScore(10);
+            if (isFoodCollected(f, blackHead)) {
+                blackPlayer.addScore(FOOD_POINTS);
                 return true;
             }
-            if (Math.abs(f.x - whiteHead.x) < CELL_SIZE * 3 && 
-                Math.abs(f.y - whiteHead.y) < CELL_SIZE * 3) {
-                whitePlayer.addScore(10);
+            if (isFoodCollected(f, whiteHead)) {
+                whitePlayer.addScore(FOOD_POINTS);
                 return true;
             }
             return false;
         });
+    }
+    
+    private boolean isFoodCollected(Point food, Point playerHead) {
+        return Math.abs(food.x - playerHead.x) < FOOD_COLLECTION_RADIUS && 
+               Math.abs(food.y - playerHead.y) < FOOD_COLLECTION_RADIUS;
     }
     
     @Override
@@ -201,7 +216,8 @@ public class Game extends JPanel implements ActionListener, KeyListener {
         Stroke dashed = new BasicStroke(2, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL,
                                         0, new float[]{5, 5}, 0);
         g.setStroke(dashed);
-        g.drawRect(10, 40, WIDTH - 20, HEIGHT - 80);
+        g.drawRect(BORDER_LEFT, BORDER_TOP, WIDTH - BORDER_LEFT - BORDER_RIGHT, 
+                   HEIGHT - BORDER_TOP - BORDER_BOTTOM);
     }
     
     private void drawUI(Graphics2D g) {
