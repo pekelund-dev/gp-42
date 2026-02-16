@@ -103,15 +103,28 @@ public class Car {
     }
     
     public void draw(Graphics2D g) {
-        // Draw car as simple text character like in the reference image
+        // Draw car as small graphical sprite matching the reference image
         Graphics2D g2 = (Graphics2D) g.create();
         g2.translate(x, y);
         g2.rotate(angle);
         
-        // Draw car as a simple symbol (like # in the image)
+        // Car body (small rectangle)
         g2.setColor(color);
-        g2.setFont(new Font("Monospaced", Font.BOLD, 20));
-        g2.drawString("#", -10, 5);
+        g2.fillRect(-CAR_WIDTH/2, -CAR_HEIGHT/2, CAR_WIDTH, CAR_HEIGHT);
+        
+        // Add white outline for visibility
+        g2.setColor(Color.WHITE);
+        g2.drawRect(-CAR_WIDTH/2, -CAR_HEIGHT/2, CAR_WIDTH, CAR_HEIGHT);
+        
+        // Add small details to suggest car shape
+        // Front bumper
+        g2.setColor(Color.LIGHT_GRAY);
+        g2.fillRect(CAR_WIDTH/2 - 2, -CAR_HEIGHT/2 + 2, 2, CAR_HEIGHT - 4);
+        
+        // Side details (windows or doors)
+        g2.setColor(Color.DARK_GRAY);
+        g2.fillRect(-CAR_WIDTH/2 + 3, -CAR_HEIGHT/2 + 3, 4, 3);
+        g2.fillRect(-CAR_WIDTH/2 + 3, CAR_HEIGHT/2 - 6, 4, 3);
         
         g2.dispose();
     }
