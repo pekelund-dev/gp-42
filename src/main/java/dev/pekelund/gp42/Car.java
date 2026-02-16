@@ -3,13 +3,12 @@ package dev.pekelund.gp42;
 import java.awt.*;
 
 public class Car {
-    // Car constants
-    private static final int CAR_WIDTH = 12;
-    private static final int CAR_HEIGHT = 8;
-    private static final double MAX_SPEED = 3.0;
-    private static final double ACCELERATION = 0.15;
-    private static final double FRICTION = 0.05;
-    private static final double TURN_SPEED = 0.08;
+    // Car constants - much smaller to match image
+    private static final int CAR_SIZE = 4; // Tiny sprite like in image
+    private static final double MAX_SPEED = 2.5;
+    private static final double ACCELERATION = 0.12;
+    private static final double FRICTION = 0.04;
+    private static final double TURN_SPEED = 0.1;
     
     private String name;
     private Color color;
@@ -98,25 +97,20 @@ public class Car {
         double dx = x - other.x;
         double dy = y - other.y;
         double distance = Math.sqrt(dx * dx + dy * dy);
-        return distance < CAR_WIDTH;
+        return distance < CAR_SIZE;
     }
     
     public void draw(Graphics2D g) {
+        // Draw car as a tiny sprite matching the image
         g.setColor(color);
         
-        // Draw car as a rotated rectangle
-        Graphics2D g2 = (Graphics2D) g.create();
-        g2.translate(x, y);
-        g2.rotate(angle);
+        // Simple small square/circle sprite
+        g.fillRect((int)(x - CAR_SIZE/2), (int)(y - CAR_SIZE/2), CAR_SIZE, CAR_SIZE);
         
-        // Draw car body
-        g2.fillRect(-CAR_WIDTH / 2, -CAR_HEIGHT / 2, CAR_WIDTH, CAR_HEIGHT);
-        
-        // Draw direction indicator (front)
-        g2.setColor(Color.RED);
-        g2.fillRect(CAR_WIDTH / 2 - 2, -2, 3, 4);
-        
-        g2.dispose();
+        // Optional: draw a small direction indicator
+        int dirX = (int)(x + Math.cos(angle) * CAR_SIZE);
+        int dirY = (int)(y + Math.sin(angle) * CAR_SIZE);
+        g.drawLine((int)x, (int)y, dirX, dirY);
     }
     
     public void addScore(int points) {
