@@ -103,28 +103,22 @@ public class Car {
     }
     
     public void draw(Graphics2D g) {
-        // Draw car as small graphical sprite matching the reference image
+        // Draw car as simple arrow/flag symbol matching the reference image
         Graphics2D g2 = (Graphics2D) g.create();
         g2.translate(x, y);
         g2.rotate(angle);
         
-        // Car body (small rectangle)
+        // Draw car as a simple arrow/flag shape pointing forward
+        // The reference image shows it as a small symbol like "⚐" 
         g2.setColor(color);
-        g2.fillRect(-CAR_WIDTH/2, -CAR_HEIGHT/2, CAR_WIDTH, CAR_HEIGHT);
         
-        // Add white outline for visibility
-        g2.setColor(Color.WHITE);
-        g2.drawRect(-CAR_WIDTH/2, -CAR_HEIGHT/2, CAR_WIDTH, CAR_HEIGHT);
+        // Main body - vertical line
+        g2.fillRect(-1, -6, 2, 12);
         
-        // Add small details to suggest car shape
-        // Front bumper
-        g2.setColor(Color.LIGHT_GRAY);
-        g2.fillRect(CAR_WIDTH/2 - 2, -CAR_HEIGHT/2 + 2, 2, CAR_HEIGHT - 4);
-        
-        // Side details (windows or doors)
-        g2.setColor(Color.DARK_GRAY);
-        g2.fillRect(-CAR_WIDTH/2 + 3, -CAR_HEIGHT/2 + 3, 4, 3);
-        g2.fillRect(-CAR_WIDTH/2 + 3, CAR_HEIGHT/2 - 6, 4, 3);
+        // Arrow/flag head pointing right (forward direction)
+        int[] xPoints = {1, 7, 1};
+        int[] yPoints = {-5, 0, 5};
+        g2.fillPolygon(xPoints, yPoints, 3);
         
         g2.dispose();
     }
