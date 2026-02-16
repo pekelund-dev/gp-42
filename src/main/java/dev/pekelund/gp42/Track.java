@@ -12,6 +12,11 @@ public class Track {
     private Area trackArea;
     private List<Rectangle2D> walls;
     
+    // Track boundaries
+    private static final int HORIZONTAL_MARGIN = 10;
+    private static final int TOP_MARGIN = 40;
+    private static final int BOTTOM_MARGIN = 40;
+    
     // Dash patterns for track lines
     private static final float[] BORDER_DASH = {5, 5};
     
@@ -24,7 +29,9 @@ public class Track {
     
     private void createTrack() {
         // Create outer boundary - full screen area
-        Rectangle2D outer = new Rectangle2D.Double(10, 40, width - 20, height - 80);
+        int trackWidth = width - 2 * HORIZONTAL_MARGIN;
+        int trackHeight = height - TOP_MARGIN - BOTTOM_MARGIN;
+        Rectangle2D outer = new Rectangle2D.Double(HORIZONTAL_MARGIN, TOP_MARGIN, trackWidth, trackHeight);
         trackArea = new Area(outer);
         
         // Create walls/obstacles that match the image layout
@@ -93,7 +100,9 @@ public class Track {
         g.setStroke(dashed);
         
         // Draw outer boundary
-        g.drawRect(10, 40, width - 20, height - 80);
+        int trackWidth = width - 2 * HORIZONTAL_MARGIN;
+        int trackHeight = height - TOP_MARGIN - BOTTOM_MARGIN;
+        g.drawRect(HORIZONTAL_MARGIN, TOP_MARGIN, trackWidth, trackHeight);
         
         // Draw walls with dotted outline
         for (Rectangle2D wall : walls) {
